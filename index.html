@@ -189,6 +189,71 @@
             font-style: italic;
         }
 
+        /* --- Сопротивления --- */
+        .resistances-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .resistance-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 6px 8px;
+            transition: 0.2s;
+        }
+
+        .resistance-item:hover {
+            border-color: var(--accent-color);
+            background: rgba(201, 160, 80, 0.05);
+        }
+
+        .resistance-icon {
+            font-size: 1.4em;
+            flex: 0 0 28px;
+            text-align: center;
+        }
+
+        .resistance-icon.fire { color: #ff6b35; }
+        .resistance-icon.cold { color: #6bc5ff; }
+        .resistance-icon.electric { color: #ffe066; }
+        .resistance-icon.magic { color: #b57bff; }
+        .resistance-icon.disease { color: #7ba05b; }
+        .resistance-icon.poison { color: #a0ff7b; }
+
+        .resistance-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resistance-label {
+            font-size: 0.7em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .resistance-input {
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-color);
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            width: 100%;
+            outline: none;
+            margin-top: 2px;
+        }
+
+        .resistance-input:focus {
+            border-color: var(--accent-color);
+        }
+
         .inventory-list {
             list-style: none;
             max-height: 300px;
@@ -429,7 +494,7 @@
         }
 
         @media (max-width: 768px) {
-            .grid-2, .skills-grid {
+            .grid-2, .skills-grid, .resistances-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -546,12 +611,60 @@
             <div class="field"><label>Чутье:</label> <input type="number" id="intuition" value="10" min="0" max="10"></div>
         </div>
         <div class="block">
-            <div class="block-title">Способности</div>
-            <textarea id="abilities" rows="9" style="width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); padding: 8px; border-radius: 4px; resize: vertical;"></textarea>
+            <div class="block-title">Сопротивления</div>
+            <div class="resistances-grid">
+                <div class="resistance-item">
+                    <div class="resistance-icon fire">🔥</div>
+                    <div class="resistance-info">
+                        <div class="resistance-label">Огонь</div>
+                        <input type="number" class="resistance-input" id="res_fire" value="0" min="0" max="100">
+                    </div>
+                </div>
+                <div class="resistance-item">
+                    <div class="resistance-icon cold">❄️</div>
+                    <div class="resistance-info">
+                        <div class="resistance-label">Холод</div>
+                        <input type="number" class="resistance-input" id="res_cold" value="0" min="0" max="100">
+                    </div>
+                </div>
+                <div class="resistance-item">
+                    <div class="resistance-icon electric">⚡</div>
+                    <div class="resistance-info">
+                        <div class="resistance-label">Электричество</div>
+                        <input type="number" class="resistance-input" id="res_electric" value="0" min="0" max="100">
+                    </div>
+                </div>
+                <div class="resistance-item">
+                    <div class="resistance-icon magic">✨</div>
+                    <div class="resistance-info">
+                        <div class="resistance-label">Магия</div>
+                        <input type="number" class="resistance-input" id="res_magic" value="0" min="0" max="100">
+                    </div>
+                </div>
+                <div class="resistance-item">
+                    <div class="resistance-icon disease">🦠</div>
+                    <div class="resistance-info">
+                        <div class="resistance-label">Болезни</div>
+                        <input type="number" class="resistance-input" id="res_disease" value="0" min="0" max="100">
+                    </div>
+                </div>
+                <div class="resistance-item">
+                    <div class="resistance-icon poison">☠️</div>
+                    <div class="resistance-info">
+                        <div class="resistance-label">Яды</div>
+                        <input type="number" class="resistance-input" id="res_poison" value="0" min="0" max="100">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="block">
+    <div class="block" style="margin-top: 15px;">
+        <div class="block-title">Способности</div>
+        <textarea id="abilities" rows="6" style="width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-color); padding: 8px; border-radius: 4px; resize: vertical;"></textarea>
+    </div>
+
+    <div class="block" style="margin-top: 15px;">
         <div class="block-title">Инвентарь</div>
         <ul class="inventory-list" id="inventoryList"></ul>
         <div class="inventory-add">
@@ -794,163 +907,4 @@
             price: price
         };
 
-        inventory.push(newItem);
-        
-        nameInput.value = '';
-        descInput.value = '';
-        weightInput.value = '';
-        priceInput.value = '';
-        
-        renderInventory();
-        updateWeightInfo();
-        saveData();
-    }
-
-    function removeItem(index) {
-        const itemName = inventory[index].name;
-        
-        for (const [slot, item] of Object.entries(equipment)) {
-            if (item === itemName) {
-                equipment[slot] = null;
-            }
-        }
-        
-        inventory.splice(index, 1);
-        renderInventory();
-        renderEquipment();
-        updateWeightInfo();
-        saveData();
-    }
-
-    function getTotalWeight() {
-        return inventory.reduce((sum, item) => sum + (item.weight || 0), 0);
-    }
-
-    function updateWeightInfo() {
-        const maxWeight = parseFloat(document.getElementById('weight').value) || 50;
-        const currentWeight = getTotalWeight();
-        const currentEl = document.getElementById('currentWeight');
-        const maxEl = document.getElementById('maxWeight');
-        const infoEl = document.getElementById('weightInfo');
-
-        currentEl.textContent = currentWeight.toFixed(1);
-        maxEl.textContent = maxWeight.toFixed(1);
-
-        if (currentWeight > maxWeight) {
-            infoEl.classList.add('overloaded');
-            currentEl.classList.add('overloaded');
-        } else {
-            infoEl.classList.remove('overloaded');
-            currentEl.classList.remove('overloaded');
-        }
-    }
-
-    document.getElementById('weight').addEventListener('input', () => {
-        updateWeightInfo();
-        saveData();
-    });
-
-    function renderEquipment() {
-        for (const [slot, item] of Object.entries(equipment)) {
-            const el = document.getElementById(`slot-${slot}`);
-            if (el) {
-                if (item) {
-                    el.textContent = item;
-                    el.classList.remove('empty');
-                } else {
-                    el.textContent = 'Пусто';
-                    el.classList.add('empty');
-                }
-            }
-        }
-    }
-
-    function openSlotModal(slot) {
-        currentSlot = slot;
-        const modal = document.getElementById('slotModal');
-        const list = document.getElementById('modalList');
-        const title = document.getElementById('modalTitle');
-
-        const slotNames = {
-            helmet: 'Шлем / Диадема',
-            armor: 'Броня',
-            gloves: 'Перчатки',
-            boots: 'Сапоги',
-            ring: 'Кольцо',
-            amulet: 'Ожерелье'
-        };
-        title.textContent = `Выберите: ${slotNames[slot]}`;
-
-        list.innerHTML = '';
-
-        if (equipment[slot]) {
-            const li = document.createElement('li');
-            li.textContent = '— Снять предмет —';
-            li.style.color = '#ff8888';
-            li.onclick = () => {
-                equipment[slot] = null;
-                renderEquipment();
-                saveData();
-                closeModal();
-            };
-            list.appendChild(li);
-        }
-
-        if (inventory.length === 0) {
-            const li = document.createElement('li');
-            li.className = 'empty-msg';
-            li.textContent = 'Инвентарь пуст';
-            list.appendChild(li);
-        } else {
-            const equippedItems = Object.values(equipment).filter(i => i !== null);
-            const availableItems = inventory.filter(item => {
-                return !equippedItems.includes(item.name) || equipment[slot] === item.name;
-            });
-
-            if (availableItems.length === 0) {
-                const li = document.createElement('li');
-                li.className = 'empty-msg';
-                li.textContent = 'Нет доступных предметов';
-                list.appendChild(li);
-            } else {
-                availableItems.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <span>${item.name}</span>
-                        <span class="item-weight">${item.weight ? item.weight + ' кг' : ''}</span>
-                    `;
-                    li.onclick = () => {
-                        equipment[slot] = item.name;
-                        renderEquipment();
-                        saveData();
-                        closeModal();
-                    };
-                    list.appendChild(li);
-                });
-            }
-        }
-
-        modal.style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('slotModal').style.display = 'none';
-        currentSlot = null;
-    }
-
-    document.getElementById('slotModal').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) {
-            closeModal();
-        }
-    });
-
-    function handleItemInput(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            addItem();
-        }
-    }
-</script>
-
-</body>
-</html>Ы
+        inventory.push(newItem
